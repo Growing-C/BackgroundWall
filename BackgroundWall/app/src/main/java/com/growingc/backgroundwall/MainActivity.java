@@ -1,6 +1,7 @@
 package com.growingc.backgroundwall;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -75,65 +76,74 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View v) {
+        String widthS = mWidthTx.getText().toString();
+        String heightS = mHeightTx.getText().toString();
+        String leftLineS = mLeftLineTx.getText().toString();
+        String topLineS = mTopLineTx.getText().toString();
+
+        int horizontalCount = Integer.parseInt(mHorizontalS.getSelectedItem().toString());
+        int verticalCount = Integer.parseInt(mVerticalS.getSelectedItem().toString());
+        System.out.println("horizontal spinner:" + horizontalCount);
+        System.out.println("vertical spinner:" + verticalCount);
+        System.out.println("mWidthTx:" + widthS);
+        System.out.println("mHeightTx:" + heightS);
+        System.out.println("mLeftLineTx:" + leftLineS);
+        System.out.println("mTopLineTx:" + topLineS);
+
+        if (TextUtils.isEmpty(widthS) || TextUtils.isEmpty(heightS) || TextUtils.isEmpty(leftLineS) || TextUtils.isEmpty(topLineS)) {
+            Snackbar.make(mLeftLineTx, "请先完善数据!", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
+        float width = Float.parseFloat(widthS);
+        float height = Float.parseFloat(heightS);
+        float leftLineSize = Float.parseFloat(leftLineS);
+        float topLineSize = Float.parseFloat(topLineS);
+        if (width <= 0 || height <= 0 || leftLineSize <= 0 || topLineSize <= 0 || leftLineSize * 2 >= width || topLineSize * 2 >= height) {
+            Snackbar.make(mLeftLineTx, "数据错误!", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
+
+        DataModel dataModel = new DataModel((int) (width * 10), (int) (height * 10), (int) (leftLineSize * 10), (int) (topLineSize * 10),
+                verticalCount, horizontalCount);
+
         switch (v.getId()) {
             case R.id.generate://生成图片
-
-                break;
-            case R.id.preview://预览
-
-                String widthS = mWidthTx.getText().toString();
-                String heightS = mHeightTx.getText().toString();
-                String leftLineS = mLeftLineTx.getText().toString();
-                String topLineS = mTopLineTx.getText().toString();
-
-                int horizontalCount = Integer.parseInt(mHorizontalS.getSelectedItem().toString());
-                int verticalCount = Integer.parseInt(mVerticalS.getSelectedItem().toString());
-                System.out.println("horizontal spinner:" + horizontalCount);
-                System.out.println("vertical spinner:" + verticalCount);
-                System.out.println("mWidthTx:" + widthS);
-                System.out.println("mHeightTx:" + heightS);
-                System.out.println("mLeftLineTx:" + leftLineS);
-                System.out.println("mTopLineTx:" + topLineS);
-
-                if (TextUtils.isEmpty(widthS) || TextUtils.isEmpty(heightS) || TextUtils.isEmpty(leftLineS) || TextUtils.isEmpty(topLineS)) {
-                    Snackbar.make(mLeftLineTx, "请先完善数据!", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    return;
-                }
-                float width = Float.parseFloat(widthS);
-                float height = Float.parseFloat(heightS);
-                float leftLineSize = Float.parseFloat(leftLineS);
-                float topLineSize = Float.parseFloat(topLineS);
-                if (width <= 0 || height <= 0 || leftLineSize <= 0 || topLineSize <= 0 || leftLineSize * 2 >= width || topLineSize * 2 >= height) {
-                    Snackbar.make(mLeftLineTx, "数据错误!", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    return;
-                }
                 //开始画图
-                Bitmap bitmap = PicGenerator.draw((int) (width * 10), (int) (height * 10), (int) (leftLineSize * 10), (int) (topLineSize * 10),
-                        verticalCount, horizontalCount);
-
+                Bitmap bitmap = PicGenerator.drawOriginal(dataModel.width, dataModel.height, dataModel.leftLineSize, dataModel.topLineSize,
+                        dataModel.verticalCount, dataModel.horizontalCount);
                 if (bitmap == null) {
                     Snackbar.make(mLeftLineTx, "数据错误,图片绘制失败!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    return;
+                } else {
+                    FileUtils.saveBitmap(MainActivity.this, bitmap, "backgroundOrigin.png");
+                    Snackbar.make(mLeftLineTx, "图片保存成功!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
+                break;
+            case R.id.preview://预览
 
-                ImageView img = new ImageView(MainActivity.this);
-                img.setAdjustViewBounds(true);
-                img.setImageBitmap(bitmap);
-//                img.setImageResource(R.mipmap.ic_launcher );
-                img.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "我被点击啦", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("预览图")
-                        .setPositiveButton("保存", null)
-                        .setView(img).create();
-                dialog.show();
+
+                Intent it = new Intent(MainActivity.this, FullscreenActivity.class);
+                it.putExtra("data", dataModel);
+                startActivity(it);
+
+//                ImageView img = new ImageView(MainActivity.this);
+//                img.setAdjustViewBounds(true);
+//                img.setImageBitmap(bitmap);
+////                img.setImageResource(R.mipmap.ic_launcher );
+//                img.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(MainActivity.this, "我被点击啦", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//                AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+//                        .setTitle("预览图")
+//                        .setPositiveButton("保存", null)
+//                        .setView(img).create();
+//                dialog.show();
 
                 break;
             default:

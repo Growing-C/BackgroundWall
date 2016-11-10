@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">BackgroundWall</string>
+    <string name="app_name">背景设计</string>
     <string name="action_settings">Settings</string>
 
     <string-array name="test"></string-array>
+
+    <string name="title_activity_fullscreen">预览图</string>
+    <string name="dummy_button">保存图片</string>
 </resources>
