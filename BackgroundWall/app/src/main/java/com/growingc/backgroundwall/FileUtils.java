@@ -13,6 +13,8 @@ import java.io.IOException;
  * Created by RB-cgy on 2016/11/10.
  */
 public class FileUtils {
+    public static String sFilePath = Environment.getExternalStorageDirectory() + "/A背景设计/";
+
 
     public static void saveBitmap(Context context, Bitmap bitmap, String fileName) {
         if (bitmap == null)
@@ -22,7 +24,7 @@ public class FileUtils {
         //这个文件夹里面的东西app删除的时候不会自动删除
         System.out.println("Environment dir:" + Environment.getExternalStorageDirectory());///storage/emulated/0
 
-        File file = new File(Environment.getExternalStorageDirectory() + "/growingc/" + fileName);///storage/emulated/0/growingc/background.png
+        File file = new File(sFilePath + fileName);///storage/emulated/0/growingc/background.png
         if (file.exists()) {
             file.delete();
         }

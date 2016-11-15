@@ -35,7 +35,7 @@ public class FullscreenActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private ImageView mContentView;
+    private ImageView mContentImageView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -45,7 +45,7 @@ public class FullscreenActivity extends AppCompatActivity {
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            mContentImageView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -97,27 +97,27 @@ public class FullscreenActivity extends AppCompatActivity {
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = (ImageView) findViewById(R.id.fullscreen_content);
+        mContentImageView = (ImageView) findViewById(R.id.fullscreen_content);
 
         Intent it = getIntent();
-        DataModel data = (DataModel) it.getSerializableExtra("data");
+        final DataModel data = (DataModel) it.getSerializableExtra("data");
 
         if (data != null) {
             //开始画图
             bitmap = PicGenerator.drawInstrument(data.width, data.height, data.leftLineSize, data.topLineSize,
                     data.verticalCount, data.horizontalCount);
             if (bitmap == null) {
-                Snackbar.make(mContentView, "数据错误,图片绘制失败!", Snackbar.LENGTH_LONG)
+                Snackbar.make(mContentImageView, "数据错误,图片绘制失败!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             } else {
-                mContentView.setImageBitmap(bitmap);
-                Snackbar.make(mContentView, "图片绘制成功!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                mContentImageView.setImageBitmap(bitmap);
+//                Snackbar.make(mContentImageView, "图片绘制成功!", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         }
 
         // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
+        mContentImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggle();
@@ -133,8 +133,10 @@ public class FullscreenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 System.out.println("onClick");
-                FileUtils.saveBitmap(FullscreenActivity.this, bitmap, "backgroundIns.png");
-                Snackbar.make(mContentView, "保存成功!", Snackbar.LENGTH_LONG)
+                if (bitmap == null)
+                    return;
+                FileUtils.saveBitmap(FullscreenActivity.this, bitmap, "设计图" + data.width / 10 + "*" + data.height / 10 + ".png");
+                Snackbar.make(mContentImageView, "保存成功!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -175,7 +177,7 @@ public class FullscreenActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mContentImageView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mVisible = true;
 

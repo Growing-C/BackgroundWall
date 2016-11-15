@@ -1,9 +1,8 @@
 package com.growingc.backgroundwall;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,9 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     Spinner mVerticalS, mHorizontalS;
@@ -69,8 +68,30 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                File file = new File(FileUtils.sFilePath);
+                if (null == file || !file.exists()) {
+                    Snackbar.make(view, "文件不存在！", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    return;
+                }
+                Intent it = new Intent(Intent.ACTION_GET_CONTENT);
+                it.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+
+//                intent.setType(“image/*”);
+//intent.setType(“audio/*”); //选择音频
+//intent.setType(“video/*”); //选择视频 （mp4 3gp 是android支持的视频格式）
+//intent.setType(“video/*;image/*”);//同时选择视频和图片
+                it.addCategory(Intent.CATEGORY_OPENABLE);
+//                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);//用了newtask会直接返回resultcanceled，所以这里不能用！
+                it.setDataAndType(Uri.fromFile(file), "file/*");
+                try {
+                    startActivityForResult(it, 1);
+                } catch (Exception e) {
+                    Snackbar.make(view, "请安装文件管理器", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+
+
             }
         });
     }
@@ -117,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.make(mLeftLineTx, "数据错误,图片绘制失败!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 } else {
-                    FileUtils.saveBitmap(MainActivity.this, bitmap, "backgroundOrigin.png");
+                    FileUtils.saveBitmap(MainActivity.this, bitmap, "原图" + width + "*" + height + ".png");
                     Snackbar.make(mLeftLineTx, "图片保存成功!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
@@ -149,6 +170,23 @@ public class MainActivity extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("onActivityResult" + resultCode);
+        if (resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            System.out.println(uri.toString());
+
+            String path = uri.getPath();
+            System.out.println(path);
+
+            Intent it = new Intent(Intent.ACTION_VIEW);
+            it.setDataAndType(uri, "image/*");
+            startActivity(it);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
