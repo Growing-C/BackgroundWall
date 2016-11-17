@@ -13,6 +13,132 @@ import java.util.ArrayList;
  * Created by RB-cgy on 2016/11/9.
  */
 public class PicGenerator {
+    //=========================画正方形===================================
+
+    /**
+     * 画原图
+     *
+     * @return
+     */
+    public static Bitmap drawOriginalSquare(DataModel model) {
+        int width = model.width;
+        int height = model.height;
+        int leftLine = model.leftLineSize;
+        int topLine = model.topLineSize;
+        int verticalCount = model.verticalCount;
+        int horizontalCount = model.horizontalCount;
+
+        System.out.println("drawOriginal-----##################- :");
+        System.out.println("mWidth------ :" + width);
+        System.out.println("mHeight--------- :" + height);
+        System.out.println("mLeftLine---------- :" + leftLine);
+        System.out.println("mTopLine----------- :" + topLine);
+
+        int recVertical = model.squareDiagonalLine;
+        int recHorizontal = model.squareDiagonalLine;
+
+        if (recVertical <= 0 || recHorizontal <= 0)
+            return null;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        ArrayList<Point> topPoints = calculateTopPoints(topLine, leftLine, recHorizontal, horizontalCount);
+        ArrayList<Point> bottomPoints = calculateBottomPoints(height, topLine, leftLine, recHorizontal, horizontalCount);
+        ArrayList<Point> leftPoints = calculateLeftPoints(topLine, leftLine, recVertical, verticalCount);
+        ArrayList<Point> rightPoints = calculateRightPoints(width, topLine, leftLine, recVertical, verticalCount);
+
+        canvas.drawColor(Color.WHITE);//大背景色
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+
+        drawTopLine(topPoints, canvas, paint);
+        drawBottomLine(bottomPoints, topLine, canvas, paint);
+        drawLeftLine(leftPoints, canvas, paint);
+        drawRightLine(rightPoints, leftLine, canvas, paint);
+
+        drawCenter(topPoints, bottomPoints, leftPoints, rightPoints, canvas, paint);
+        return bitmap;
+    }
+
+    /**
+     * 画预览图  长宽等尺寸都放大了10
+     *
+     * @return
+     */
+    public static Bitmap drawInstrumentSquare(DataModel model) {
+        int width = model.width;
+        int height = model.height;
+        int leftLine = model.leftLineSize;
+        int topLine = model.topLineSize;
+        int verticalCount = model.verticalCount;
+        int horizontalCount = model.horizontalCount;
+        System.out.println("mWidth------ :" + width);
+        System.out.println("mHeight--------- :" + height);
+        System.out.println("mLeftLine---------- :" + leftLine);
+        System.out.println("mTopLine----------- :" + topLine);
+
+        int recVertical = model.squareDiagonalLine;
+        int recHorizontal = model.squareDiagonalLine;
+
+        if (recVertical <= 0 || recHorizontal <= 0)
+            return null;
+//                A4纸的尺寸是210mm×297mm，
+//                当你设定的分辨率是72像素/英寸时，A4纸的尺寸的图像的像素是595×842，
+//                当你设定的分辨率是150像素/英寸时，A4纸的尺寸的图像的像素是1240×1754，
+//                当你设定的分辨率是300像素/英寸时，A4纸的尺寸的图像的像素是2479×3508，
+        Bitmap bitmap = Bitmap.createBitmap(width + 200, height + 200, Bitmap.Config.ARGB_8888);//右边和下方增加文字区域
+        Canvas canvas = new Canvas(bitmap);
+
+        ArrayList<Point> topPoints = calculateTopPoints(topLine, leftLine, recHorizontal, horizontalCount);
+        ArrayList<Point> bottomPoints = calculateBottomPoints(height, topLine, leftLine, recHorizontal, horizontalCount);
+        ArrayList<Point> leftPoints = calculateLeftPoints(topLine, leftLine, recVertical, verticalCount);
+        ArrayList<Point> rightPoints = calculateRightPoints(width, topLine, leftLine, recVertical, verticalCount);
+
+        canvas.drawColor(Color.WHITE);//大背景色
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.parseColor("#b8ad9b"));
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(0f, 0f, width, height, paint);//画作图区域
+
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+
+        drawTopLine(topPoints, canvas, paint);
+        drawBottomLine(bottomPoints, topLine, canvas, paint);
+        drawLeftLine(leftPoints, canvas, paint);
+        drawRightLine(rightPoints, leftLine, canvas, paint);
+
+        drawCenter(topPoints, bottomPoints, leftPoints, rightPoints, canvas, paint);
+
+        Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setTextAlign(Paint.Align.CENTER);// 设置文字对齐方式在其中心
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(30);
+        canvas.drawText("Ⅰ", (leftLine + recHorizontal / 2) / 2, (topLine + recVertical / 2) / 2, textPaint);//左上角的块
+        canvas.drawText("Ⅱ", leftLine + recHorizontal, (topLine + recVertical / 2) / 2, textPaint);//上排的块
+        canvas.drawText("Ⅲ", (leftLine + recHorizontal / 2) / 2, topLine + recVertical, textPaint);//左排的块
+        canvas.drawText("Ⅳ", leftLine + recHorizontal / 2, topLine + recVertical / 2, textPaint);//四边形块
+
+        drawText(height, topLine, leftLine, recHorizontal, recVertical, topPoints.size(), leftPoints.size(), canvas, textPaint);
+
+        canvas.drawText("背景尺寸", width + 70, 50, textPaint);
+        canvas.drawText(((float) width) / 10 + "*" + ((float) height) / 10, width + 90, 100, textPaint);
+        canvas.drawText("实际尺寸", width + 70, 200, textPaint);
+        canvas.drawText(((float) model.realWidth) / 10 + "*" + ((float) model.realHeight) / 10, width + 90, 250, textPaint);
+        return bitmap;
+    }
+
+
+//    =========================以下为画菱形===============================
 
     /**
      * 画原图

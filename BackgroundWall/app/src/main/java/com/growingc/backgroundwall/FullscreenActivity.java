@@ -104,8 +104,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         if (data != null) {
             //开始画图
-            bitmap = PicGenerator.drawInstrument(data.width, data.height, data.leftLineSize, data.topLineSize,
-                    data.verticalCount, data.horizontalCount);
+            bitmap = PicGenerator.drawInstrumentSquare(data);
             if (bitmap == null) {
                 Snackbar.make(mContentImageView, "数据错误,图片绘制失败!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
