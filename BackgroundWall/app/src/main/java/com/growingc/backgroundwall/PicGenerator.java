@@ -339,7 +339,7 @@ public class PicGenerator {
 
         DecimalFormat decimalFormat = new DecimalFormat(".0");
         //下面为尺寸
-        canvas.drawText((leftLineSize + recHorizontal / 2) + "", (leftLineSizeI + recHorizontalI / 2) / 2, 100, paint);//左上角
+        canvas.drawText((leftLineSize + recHorizontal / 2) + "", (leftLineSizeI + recHorizontalI / 2) / 2, 40, paint);//左上角
         canvas.drawText(topLineSize + "", leftLineSizeI + recHorizontalI / 2, topLineSizeI / 2, paint);//右边
         canvas.drawText(leftLineSize + "", leftLineSizeI / 2, (topLineSizeI + recVerticalI / 2) - 20, paint);//下边
         canvas.drawText(decimalFormat.format(recLen) + "", leftLineSizeI + recHorizontalI / 4, topLineSizeI + recVerticalI / 4, paint);//四边形边
@@ -379,6 +379,15 @@ public class PicGenerator {
         return (width - 2 * leftLine) / horizontalCount;
     }
 
+    /**
+     * 计算上边的线点
+     *
+     * @param topLineSize
+     * @param leftLineSize
+     * @param recHorizontal
+     * @param horizontalCount
+     * @return
+     */
     private static ArrayList<Point> calculateTopPoints(int topLineSize, int leftLineSize, int recHorizontal, int horizontalCount) {
         ArrayList<Point> topPoints = new ArrayList<>();
         int x = leftLineSize + recHorizontal / 2;

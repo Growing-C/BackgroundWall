@@ -21,6 +21,9 @@ import android.widget.Spinner;
 
 import java.io.File;
 
+/**
+ * 最初版背景墙设计模式，宽高，
+ */
 public class MainActivity extends AppCompatActivity {
     Spinner mVerticalS, mHorizontalS;
     EditText mWidthTx, mHeightTx, mLeftLineTx, mTopLineTx;

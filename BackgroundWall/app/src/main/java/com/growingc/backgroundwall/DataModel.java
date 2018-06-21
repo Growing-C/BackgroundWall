@@ -22,6 +22,61 @@ public class DataModel implements Serializable {
     }
 
     /**
+     * 构造方法，默认尺寸的正方形使用
+     *
+     * @param width           此处的值都放大了10倍
+     * @param height
+     * @param squareSize
+     * @param verticalCount
+     * @param horizontalCount
+     */
+    public DataModel(int width, int height, int squareSize, int verticalCount, int horizontalCount) {
+        this.width = width;
+        this.height = height;
+
+        squareDiagonalLine = (int) Math.sqrt(Math.pow(squareSize, 2) + Math.pow(squareSize, 2));//对角线
+
+        if (verticalCount > 0)//如果设置了上下数目则为该值，否则计算之
+            this.verticalCount = verticalCount;
+        else
+            this.verticalCount = height / squareDiagonalLine;//上下能包含几个正方形就是几个
+
+        if (horizontalCount > 0)//如果设置了左右数目则为该值，否则计算之
+            this.horizontalCount = horizontalCount;
+        else
+            this.horizontalCount = width / squareDiagonalLine;
+
+        System.out.println("width:" + width);
+        System.out.println("height:" + height);
+        System.out.println("squareDiagonalLine:" + squareDiagonalLine);
+        System.out.println("verticalCount:" + this.verticalCount);
+        System.out.println("horizontalCount:" + this.horizontalCount);
+
+        if (this.verticalCount > 0 && this.horizontalCount > 0) {
+            leftLineSize = (width - squareDiagonalLine * this.horizontalCount) / 2;
+            topLineSize = (height - squareDiagonalLine * this.verticalCount) / 2;
+
+            System.out.println("leftLineSize:" + leftLineSize);
+            System.out.println("topLineSize:" + topLineSize);
+
+            if (leftLineSize >= 0 && topLineSize >= 0)//如果计算无误则setRealSize
+                setRealSize();
+        }
+    }
+
+    /**
+     * 验证数据正确性
+     *
+     * @return
+     */
+    public boolean isDataRight() {
+        if (this.verticalCount <= 0 || this.horizontalCount <= 0 || leftLineSize < 0 || topLineSize < 0)
+            return false;
+
+        return true;
+    }
+
+    /**
      * 构造方法，菱形用的
      *
      * @param width
